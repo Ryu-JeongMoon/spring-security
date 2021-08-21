@@ -26,4 +26,9 @@ public class SpringSecurityApplication {
 	public ObjectMapper objectMapper() {
 		return new ObjectMapper();
 	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
 }

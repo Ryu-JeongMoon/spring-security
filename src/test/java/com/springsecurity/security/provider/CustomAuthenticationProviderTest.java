@@ -20,8 +20,8 @@ class CustomAuthenticationProviderTest {
         String input = "1234";
         String encodedPassword = passwordEncoder.encode(input);
 
-        log.info("input = {}", input);
-        log.info("encodedPassword = {}", encodedPassword);
+//        log.info("input = {}", input);
+//        log.info("encodedPassword = {}", encodedPassword);
 
         assertThat(passwordEncoder.matches(input, encodedPassword));
     }

@@ -1,6 +1,7 @@
 package com.springsecurity.security.config;
 
 import com.springsecurity.security.common.FormWebAuthenticationDetailsSource;
+import com.springsecurity.security.handler.FormAccessDeniedHandler;
 import com.springsecurity.security.provider.FormAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -29,16 +30,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final FormWebAuthenticationDetailsSource formWebAuthenticationDetailsSource;
     private final AuthenticationSuccessHandler formAuthenticationSuccessHandler;
     private final AuthenticationFailureHandler formAuthenticationFailureHandler;
-    private final AccessDeniedHandler accessDeniedHandler;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+    private final FormAccessDeniedHandler formAccessDeniedHandler;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        return new FormAuthenticationProvider(userDetailsService, passwordEncoder());
+        return new FormAuthenticationProvider(userDetailsService, passwordEncoder);
     }
 
     @Override
@@ -82,6 +79,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
             .exceptionHandling()
-            .accessDeniedHandler(accessDeniedHandler);
+            .accessDeniedHandler(formAccessDeniedHandler);
     }
 }
