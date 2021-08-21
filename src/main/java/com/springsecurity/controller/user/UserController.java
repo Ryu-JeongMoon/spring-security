@@ -17,7 +17,6 @@ public class UserController {
 
     private final ModelMapper modelMapper;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/mypage")
     public String mypage() {
@@ -32,7 +31,6 @@ public class UserController {
     @PostMapping("/users")
     public String createUser(@ModelAttribute AccountDto accountDto) {
         Account account = modelMapper.map(accountDto, Account.class);
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
         userService.createUser(account);
 
         return "redirect:/";

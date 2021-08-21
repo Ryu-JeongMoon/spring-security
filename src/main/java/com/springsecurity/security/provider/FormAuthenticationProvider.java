@@ -12,32 +12,27 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class FormAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        String username = (String) authentication.getPrincipal();
+        String username = authentication.getName();
         String password = (String) authentication.getCredentials();
-
-        /** authentication 에 getName() or getPrincipal() 둘 다 이름 가져오는 듯 */
-        System.out.println("authentication.getName() = " + authentication.getName());
-        System.out.println("authentication.getPrincipal() = " + authentication.getPrincipal());
-
         AccountContext ac = (AccountContext) userDetailsService.loadUserByUsername(username);
 
-        if (!passwordEncoder.matches(password, ac.getAccount().getPassword()))
+        if (!passwordEncoder.matches(password, ac.getPassword()))
             throw new BadCredentialsException("유효하지 않은 비밀번호!");
 
-        FormWebAuthenticationDetails details = (FormWebAuthenticationDetails) authentication.getDetails();
-        String secretKey = details.getSecretKey();
-
+        String secretKey = ((FormWebAuthenticationDetails) authentication.getDetails()).getSecretKey();
         if (secretKey == null || !"secret".equals(secretKey))
             throw new InsufficientAuthenticationException("invalid secret key");
 
