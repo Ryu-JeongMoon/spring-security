@@ -1,6 +1,10 @@
 package com.springsecurity.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springsecurity.security.common.AjaxLoginAuthenticationEntryPoint;
 import com.springsecurity.security.common.FormWebAuthenticationDetailsSource;
+import com.springsecurity.security.handler.AjaxAuthenticationFailureHandler;
+import com.springsecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import com.springsecurity.security.handler.FormAccessDeniedHandler;
 import com.springsecurity.security.provider.FormAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +19,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -32,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final AuthenticationFailureHandler formAuthenticationFailureHandler;
     private final FormAccessDeniedHandler formAccessDeniedHandler;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -48,10 +51,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authenticationProvider());
     }
 
-    /** 정적 파일에 대해 Filter 자체를 거치지 않게 하기 위함 (비용적 측면을 고려) */
+    /**
+     * 정적 파일에 대해 Filter 자체를 거치지 않게 하기 위함 (비용적 측면을 고려)
+     */
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        web.ignoring()
+           .requestMatchers(PathRequest.toStaticResources()
+                                       .atCommonLocations());
     }
 
     @Override
@@ -79,6 +86,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
             .exceptionHandling()
-            .accessDeniedHandler(formAccessDeniedHandler);
+            .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
+            .accessDeniedHandler(formAccessDeniedHandler)
+
+            .and()
+            .csrf()
+            .disable();
+
+
+        customConfigurerAjax(http);
+    }
+
+    private void customConfigurerAjax(HttpSecurity http) throws Exception {
+        http.apply(new AjaxLoginConfigurer<>())
+            .successHandlerAjax(ajaxAuthenticationSuccessHandler())
+            .failureHandlerAjax(ajaxAuthenticationFailureHandler())
+            .setAuthenticationManager(authenticationManagerBean())
+            .loginProcessingUrl("/api/login");
+    }
+
+    @Bean
+    public AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
+        return new AjaxAuthenticationSuccessHandler(objectMapper);
+    }
+
+    @Bean
+    public AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler() {
+        return new AjaxAuthenticationFailureHandler(objectMapper);
     }
 }
