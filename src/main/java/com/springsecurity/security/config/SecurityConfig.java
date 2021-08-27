@@ -87,6 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .exceptionHandling()
             .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
+            .accessDeniedPage("/denied")
             .accessDeniedHandler(formAccessDeniedHandler)
 
             .and()

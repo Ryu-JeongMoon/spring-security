@@ -3,7 +3,6 @@ package com.springsecurity.controller.login;
 import com.springsecurity.domain.Account;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 public class LoginController {
 
-    @GetMapping("/login")
-    public String login(@RequestParam(value = "error", required = false) String error,
-                        @RequestParam(value = "exception", required = false) String exception, Model model) {
+    @GetMapping(value = { "/login", "/api/login" })
+    public String login(@RequestParam(value = "error",
+                                      required = false) String error, @RequestParam(
+            value = "exception",
+            required = false) String exception, Model model) {
         model.addAttribute("error", error);
         model.addAttribute("exception", exception);
 
@@ -28,7 +29,8 @@ public class LoginController {
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext()
+                                                             .getAuthentication();
 
         if (authentication != null)
             new SecurityContextLogoutHandler().logout(request, response, authentication);
@@ -36,9 +38,11 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @GetMapping("/denied")
-    public String accessDenied(@RequestParam(value = "exception", required = false) String exception, Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @GetMapping(value = { "/denied", "/api/denied" })
+    public String accessDenied(@RequestParam(value = "exception",
+                                             required = false) String exception, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext()
+                                                             .getAuthentication();
         Account account = (Account) authentication.getPrincipal();
         model.addAttribute("username", account.getUsername());
         model.addAttribute("exception", exception);
