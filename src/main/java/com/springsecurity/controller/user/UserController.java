@@ -1,36 +1,35 @@
 package com.springsecurity.controller.user;
 
-import com.springsecurity.domain.Account;
-import com.springsecurity.domain.AccountDto;
+
+import com.springsecurity.domain.entity.Account;
+import com.springsecurity.service.RoleService;
 import com.springsecurity.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
-@RequiredArgsConstructor
 public class UserController {
 
-    private final ModelMapper modelMapper;
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
-    @GetMapping("/mypage")
-    public String mypage() {
-        return "user/mypage";
-    }
+    @Autowired
+    private RoleService roleService;
 
-    @GetMapping("/users")
-    public String createUserForm() {
+    @GetMapping(value = "/users")
+    public String createUser() throws Exception {
+
         return "user/login/register";
     }
 
-    @PostMapping("/users")
-    public String createUser(@ModelAttribute AccountDto accountDto) {
-        Account account = modelMapper.map(accountDto, Account.class);
+    @PostMapping(value = "/users")
+    public String createUser(UserDto userDto) throws Exception {
+
+        ModelMapper modelMapper = new ModelMapper();
+        Account account = modelMapper.map(userDto, Account.class);
         userService.createUser(account);
 
         return "redirect:/";
