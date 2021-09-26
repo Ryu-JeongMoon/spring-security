@@ -11,10 +11,4 @@ public class HomeController {
     public String home() throws Exception {
         return "home";
     }
-
-    @GetMapping(value = "/login")
-    public String login() throws Exception {
-        return "login";
-    }
-
 }
