@@ -1,23 +1,20 @@
 package io.security.springsecurity.security.config;
 
 import io.security.springsecurity.security.common.FormAuthenticationDetailsSource;
-import io.security.springsecurity.security.filter.AjaxAuthenticationFilter;
-import io.security.springsecurity.security.handler.CustomAccessDeniedHandler;
-import io.security.springsecurity.security.handler.CustomAuthenticationFailureHandler;
-import io.security.springsecurity.security.handler.CustomAuthenticationSuccessHandler;
-import io.security.springsecurity.security.provider.CustomAuthenticationProvider;
+import io.security.springsecurity.security.handler.FormAccessDeniedHandler;
+import io.security.springsecurity.security.handler.FormAuthenticationFailureHandler;
+import io.security.springsecurity.security.handler.FormAuthenticationSuccessHandler;
+import io.security.springsecurity.security.provider.FormAuthenticationProvider;
 import io.security.springsecurity.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Log4j2
 @EnableWebSecurity
@@ -25,22 +22,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAuthenticationProvider customAuthenticationProvider;
+    private final FormAuthenticationProvider customAuthenticationProvider;
     private final FormAuthenticationDetailsSource formAuthenticationDetailsSource;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final FormAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final FormAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final FormAccessDeniedHandler customAccessDeniedHandler;
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public AjaxAuthenticationFilter ajaxAuthenticationFilter() throws Exception {
-        AjaxAuthenticationFilter ajaxAuthenticationFilter = new AjaxAuthenticationFilter();
-        ajaxAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
-        return ajaxAuthenticationFilter;
     }
 
     @Override
@@ -77,10 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
             .exceptionHandling()
-            .accessDeniedHandler(customAccessDeniedHandler)
-
-            .and()
-            .addFilterBefore(ajaxAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .accessDeniedHandler(customAccessDeniedHandler);
     }
 }
 
