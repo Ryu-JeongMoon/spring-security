@@ -1,5 +1,5 @@
 POST http://localhost:8080/api/login
-Content-Type: application/json
+Content-Type: application/json;charset=UTF-8
 X-Requested-With: XMLHttpRequest
 
 {
@@ -14,7 +14,7 @@ X-Requested-With: XMLHttpRequest
 
 {
   "username": "manager",
-  "password": "1234"
+  "password": "1111"
 }
 
 ### Send POST request with body as parameters

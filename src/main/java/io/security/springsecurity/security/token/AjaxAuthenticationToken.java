@@ -1,5 +1,6 @@
 package io.security.springsecurity.security.token;
 
+import io.security.springsecurity.domain.dto.UserDto;
 import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
