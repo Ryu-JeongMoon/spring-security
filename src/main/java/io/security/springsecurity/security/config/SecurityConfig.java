@@ -4,17 +4,23 @@ import io.security.springsecurity.security.common.FormAuthenticationDetailsSourc
 import io.security.springsecurity.security.handler.FormAccessDeniedHandler;
 import io.security.springsecurity.security.handler.FormAuthenticationFailureHandler;
 import io.security.springsecurity.security.handler.FormAuthenticationSuccessHandler;
+import io.security.springsecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import io.security.springsecurity.security.provider.FormAuthenticationProvider;
 import io.security.springsecurity.security.service.CustomUserDetailsService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 @Log4j2
 @EnableWebSecurity
@@ -27,6 +33,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final FormAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final FormAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final FormAccessDeniedHandler customAccessDeniedHandler;
+    private final UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
+
+    @Bean
+    public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
+        FilterSecurityInterceptor interceptor = new FilterSecurityInterceptor();
+        interceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource);
+        interceptor.setAccessDecisionManager(new AffirmativeBased(List.of(new RoleVoter())));
+        interceptor.setAuthenticationManager(authenticationManagerBean());
+
+        return interceptor;
+    }
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -50,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .authorizeRequests()
             .antMatchers("/", "/login", "/accounts").permitAll()
-            .antMatchers("/my-page").hasRole("USER")
+            .antMatchers("/mypage").hasRole("USER")
             .antMatchers("/messages").hasRole("MANAGER")
             .antMatchers("/config").hasRole("ADMIN")
             .anyRequest().authenticated()
@@ -67,7 +84,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
             .exceptionHandling()
-            .accessDeniedHandler(customAccessDeniedHandler);
+            .accessDeniedHandler(customAccessDeniedHandler)
+
+            .and()
+            .addFilterBefore(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class);
     }
 }
 

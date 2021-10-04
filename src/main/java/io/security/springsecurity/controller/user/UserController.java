@@ -19,7 +19,7 @@ public class UserController {
 //    private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/my-page")
+    @GetMapping("/mypage")
     public String myPage() {
         return "user/mypage";
     }

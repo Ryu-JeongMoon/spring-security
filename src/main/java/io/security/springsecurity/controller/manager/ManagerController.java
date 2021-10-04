@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class ManagerController {
 
-    @GetMapping(value="/manager")
+    @GetMapping(value="/messages")
     public String mypage() {
         return "manager/manager";
     }
