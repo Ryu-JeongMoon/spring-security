@@ -23,13 +23,13 @@ public class MethodResourcesMapFactoryBean implements FactoryBean<LinkedHashMap<
     }
 
     public void init() {
-        if ("method".equals(resourceType)) {
-            resourcesMap = securityResourceService.getMethodResourceList();
-        } else if ("pointcut".equals(resourceType)) {
-            resourcesMap = securityResourceService.getPointcutResourceList();
-        } else {
-            log.error("resourceType must be 'method' or 'pointcut'");
-        }
+//        if ("method".equals(resourceType)) {
+//            resourcesMap = securityResourceService.getMethodResourceList();
+//        } else if ("pointcut".equals(resourceType)) {
+//            resourcesMap = securityResourceService.getPointcutResourceList();
+//        } else {
+//            log.error("resourceType must be 'method' or 'pointcut'");
+//        }
     }
 
     public LinkedHashMap<String, List<ConfigAttribute>> getObject() {

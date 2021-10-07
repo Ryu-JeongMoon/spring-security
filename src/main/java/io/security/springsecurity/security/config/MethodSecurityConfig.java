@@ -1,24 +1,30 @@
 package io.security.springsecurity.security.config;
 
 import io.security.springsecurity.security.aop.CustomMethodSecurityInterceptor;
+import io.security.springsecurity.security.enums.SecurityMethodType;
 import io.security.springsecurity.security.factory.MethodResourcesMapFactoryBean;
+import io.security.springsecurity.security.processor.ProtectPointcutPostProcessor;
 import io.security.springsecurity.service.SecurityResourceService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.access.intercept.RunAsManager;
 import org.springframework.security.access.method.MapBasedMethodSecurityMetadataSource;
 import org.springframework.security.access.method.MethodSecurityMetadataSource;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 
 @Configuration
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
-    private final SecurityResourceService securityResourceService;
-    private final CustomMethodSecurityInterceptor customMethodSecurityInterceptor;
+    @Autowired
+    private SecurityResourceService securityResourceService;
+//    private final CustomMethodSecurityInterceptor customMethodSecurityInterceptor;
 
     protected MethodSecurityMetadataSource customMethodSecurityMetadataSource() {
         return mapBasedMethodSecurityMetadataSource();
@@ -26,14 +32,14 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Bean
     public MapBasedMethodSecurityMetadataSource mapBasedMethodSecurityMetadataSource() {
-        return new MapBasedMethodSecurityMetadataSource(methodResourcesMapFactoryBean().getObject());
+        return new MapBasedMethodSecurityMetadataSource(Objects.requireNonNull(methodResourcesMapFactoryBean().getObject()));
     }
 
     @Bean
     public MethodResourcesMapFactoryBean methodResourcesMapFactoryBean() {
         MethodResourcesMapFactoryBean methodResourcesMapFactoryBean = new MethodResourcesMapFactoryBean();
         methodResourcesMapFactoryBean.setSecurityResourceService(securityResourceService);
-        methodResourcesMapFactoryBean.setResourceType(SecurtiyMethodType.METHOD.getValue());
+        methodResourcesMapFactoryBean.setResourceType(SecurityMethodType.METHOD.getValue());
         return methodResourcesMapFactoryBean;
     }
 
@@ -75,7 +81,21 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
         MethodResourcesMapFactoryBean pointcutResourcesMapFactoryBean = new MethodResourcesMapFactoryBean();
         pointcutResourcesMapFactoryBean.setSecurityResourceService(securityResourceService);
-        pointcutResourcesMapFactoryBean.setResourceType(SecurtiyMethodType.POINTCUT.getValue());
+        pointcutResourcesMapFactoryBean.setResourceType(SecurityMethodType.POINTCUT.getValue());
         return pointcutResourcesMapFactoryBean;
+    }
+
+    @Bean
+    public CustomMethodSecurityInterceptor customMethodSecurityInterceptor(MapBasedMethodSecurityMetadataSource methodSecurityMetadataSource) {
+        CustomMethodSecurityInterceptor customMethodSecurityInterceptor =  new CustomMethodSecurityInterceptor(methodSecurityMetadataSource);
+        customMethodSecurityInterceptor.setAccessDecisionManager(accessDecisionManager());
+        customMethodSecurityInterceptor.setAfterInvocationManager(afterInvocationManager());
+        RunAsManager runAsManager = runAsManager();
+
+        if (runAsManager != null) {
+            customMethodSecurityInterceptor.setRunAsManager(runAsManager);
+        }
+
+        return customMethodSecurityInterceptor;
     }
 }

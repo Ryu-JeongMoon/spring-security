@@ -1,6 +1,7 @@
 package io.security.springsecurity.security.config;
 
 import io.security.springsecurity.security.common.FormAuthenticationDetailsSource;
+import io.security.springsecurity.security.filter.PermitAllFilter;
 import io.security.springsecurity.security.handler.FormAccessDeniedHandler;
 import io.security.springsecurity.security.handler.FormAuthenticationFailureHandler;
 import io.security.springsecurity.security.handler.FormAuthenticationSuccessHandler;
@@ -35,14 +36,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final FormAccessDeniedHandler customAccessDeniedHandler;
     private final UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
 
+    private final List<String> permitAllResources = List.of("/", "/login", "/user/login/**");
+
     @Bean
     public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-        FilterSecurityInterceptor interceptor = new FilterSecurityInterceptor();
-        interceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource);
-        interceptor.setAccessDecisionManager(new AffirmativeBased(List.of(new RoleVoter())));
-        interceptor.setAuthenticationManager(authenticationManagerBean());
+        FilterSecurityInterceptor permitAllFilter = new PermitAllFilter(permitAllResources);
+        permitAllFilter.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource);
+        permitAllFilter.setAccessDecisionManager(new AffirmativeBased(List.of(new RoleVoter())));
+        permitAllFilter.setAuthenticationManager(authenticationManagerBean());
 
-        return interceptor;
+        return permitAllFilter;
     }
 
     @Override

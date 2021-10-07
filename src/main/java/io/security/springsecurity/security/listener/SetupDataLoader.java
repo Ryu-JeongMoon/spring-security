@@ -84,7 +84,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     public Role createRoleIfNotFound(String roleName, String roleDesc) {
-
         Role role = roleRepository.findByRoleName(roleName);
 
         if (role == null) {
@@ -93,12 +92,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 .roleDesc(roleDesc)
                 .build();
         }
+
         return roleRepository.save(role);
     }
 
     @Transactional
     public Account createUserIfNotFound(String userName, String password, String email, int age, Set<Role> roleSet) {
-
         Account account = userRepository.findByUsername(userName)
             .orElseThrow(() -> new EntityNotFoundException("회원 없음"));
 
@@ -111,6 +110,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                 .userRoles(roleSet)
                 .build();
         }
+
         return userRepository.save(account);
     }
 
@@ -132,16 +132,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     public void createRoleHierarchyIfNotFound(Role childRole, Role parentRole) {
-
         RoleHierarchy roleHierarchy = roleHierarchyRepository.findByChildName(parentRole.getRoleName());
         if (roleHierarchy == null) {
             roleHierarchy = RoleHierarchy.builder()
                 .childName(parentRole.getRoleName())
                 .build();
         }
+
         RoleHierarchy parentRoleHierarchy = roleHierarchyRepository.save(roleHierarchy);
 
         roleHierarchy = roleHierarchyRepository.findByChildName(childRole.getRoleName());
+
         if (roleHierarchy == null) {
             roleHierarchy = RoleHierarchy.builder()
                 .childName(childRole.getRoleName())
@@ -154,12 +155,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private void setupAccessIpData() {
         AccessIp byIpAddress = accessIpRepository.findByIpAddress("127.0.0.1");
+
         if (byIpAddress == null) {
             AccessIp accessIp = AccessIp.builder()
                 .ipAddress("127.0.0.1")
                 .build();
             accessIpRepository.save(accessIp);
         }
-
     }
 }

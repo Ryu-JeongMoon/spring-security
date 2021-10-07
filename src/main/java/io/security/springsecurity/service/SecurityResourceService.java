@@ -1,6 +1,8 @@
 package io.security.springsecurity.service;
 
+import io.security.springsecurity.domain.entity.AccessIp;
 import io.security.springsecurity.domain.entity.Resources;
+import io.security.springsecurity.repository.AccessIpRepository;
 import io.security.springsecurity.repository.ResourcesRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class SecurityResourceService {
 
     private final ResourcesRepository resourcesRepository;
+    private final AccessIpRepository accessIpRepository;
 
     public ConcurrentHashMap<RequestMatcher, List<ConfigAttribute>> getResourceMap() {
         ConcurrentHashMap<RequestMatcher, List<ConfigAttribute>> result = new ConcurrentHashMap<>();
@@ -32,5 +35,12 @@ public class SecurityResourceService {
             });
 
         return result;
+    }
+
+    public List<String> getIpList() {
+        return accessIpRepository.findAll()
+            .stream()
+            .map(AccessIp::getIpAddress)
+            .collect(Collectors.toList());
     }
 }

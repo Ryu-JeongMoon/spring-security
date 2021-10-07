@@ -1,14 +1,26 @@
 package io.security.springsecurity.domain.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Table(name="ROLE_HIERARCHY")
+@Table(name = "ROLE_HIERARCHY")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,10 +36,10 @@ public class RoleHierarchy implements Serializable {
     @Column(name = "child_name")
     private String childName;
 
-    @ManyToOne(cascade = {CascadeType.ALL},fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_name", referencedColumnName = "child_name")
     private RoleHierarchy parentName;
 
-    @OneToMany(mappedBy = "parentName", cascade={CascadeType.ALL})
-    private Set<RoleHierarchy> roleHierarchy = new HashSet<RoleHierarchy>();
+    @OneToMany(mappedBy = "parentName", cascade = {CascadeType.ALL})
+    private Set<RoleHierarchy> roleHierarchy = new HashSet<>();
 }
