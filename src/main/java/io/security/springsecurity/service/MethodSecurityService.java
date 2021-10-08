@@ -1,7 +1,6 @@
 package io.security.springsecurity.service;
 
 import io.security.springsecurity.security.aop.CustomMethodSecurityInterceptor;
-import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.ProxyFactory;
@@ -34,7 +33,7 @@ public class MethodSecurityService {
         proxyFactory.addAdvice(methodSecurityInterceptor);
         Object proxy = proxyFactory.getProxy();
 
-        List<ConfigAttribute> attr = Arrays.asList(new SecurityConfig(roleName));
+        List<ConfigAttribute> attr = List.of(new SecurityConfig(roleName));
         mapBasedMethodSecurityMetadataSource.addSecureMethod(type, methodName, attr);
 
         DefaultSingletonBeanRegistry registry = (DefaultSingletonBeanRegistry) applicationContext.getBeanFactory();

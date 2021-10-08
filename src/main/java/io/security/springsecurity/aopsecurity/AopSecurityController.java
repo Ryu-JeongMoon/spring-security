@@ -36,6 +36,13 @@ public class AopSecurityController {
         return "aop/method";
     }
 
+    @GetMapping("/method-secured")
+    public String methodSecured(Model model) {
+        aopMethodService.methodTest();
+        model.addAttribute("method", "Success MethodSecured");
+        return "aop/method";
+    }
+
     @GetMapping("/method")
     public String methodTest() {
         aopMethodService.methodTest();

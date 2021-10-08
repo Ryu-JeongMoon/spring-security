@@ -5,8 +5,6 @@ import io.security.springsecurity.security.enums.SecurityMethodType;
 import io.security.springsecurity.security.factory.MethodResourcesMapFactoryBean;
 import io.security.springsecurity.security.processor.ProtectPointcutPostProcessor;
 import io.security.springsecurity.service.SecurityResourceService;
-import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,13 +24,14 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
     private SecurityResourceService securityResourceService;
 //    private final CustomMethodSecurityInterceptor customMethodSecurityInterceptor;
 
+    @Override
     protected MethodSecurityMetadataSource customMethodSecurityMetadataSource() {
         return mapBasedMethodSecurityMetadataSource();
     }
 
     @Bean
     public MapBasedMethodSecurityMetadataSource mapBasedMethodSecurityMetadataSource() {
-        return new MapBasedMethodSecurityMetadataSource(Objects.requireNonNull(methodResourcesMapFactoryBean().getObject()));
+        return new MapBasedMethodSecurityMetadataSource(methodResourcesMapFactoryBean().getObject());
     }
 
     @Bean
@@ -86,8 +85,10 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
     }
 
     @Bean
-    public CustomMethodSecurityInterceptor customMethodSecurityInterceptor(MapBasedMethodSecurityMetadataSource methodSecurityMetadataSource) {
-        CustomMethodSecurityInterceptor customMethodSecurityInterceptor =  new CustomMethodSecurityInterceptor(methodSecurityMetadataSource);
+    public CustomMethodSecurityInterceptor customMethodSecurityInterceptor(
+        MapBasedMethodSecurityMetadataSource methodSecurityMetadataSource) {
+        CustomMethodSecurityInterceptor customMethodSecurityInterceptor = new CustomMethodSecurityInterceptor(
+            methodSecurityMetadataSource);
         customMethodSecurityInterceptor.setAccessDecisionManager(accessDecisionManager());
         customMethodSecurityInterceptor.setAfterInvocationManager(afterInvocationManager());
         RunAsManager runAsManager = runAsManager();
